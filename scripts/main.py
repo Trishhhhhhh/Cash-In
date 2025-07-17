@@ -10,7 +10,7 @@ from PIL import Image
 
 # Configure page FIRST
 st.set_page_config(
-    page_title="GCash Cash-In",
+    page_title="Cash-In",
     page_icon="💳",
     layout="centered",
     initial_sidebar_state="collapsed"
