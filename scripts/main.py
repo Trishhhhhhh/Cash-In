@@ -8,13 +8,25 @@ from barcode import Code128
 from barcode.writer import ImageWriter
 from PIL import Image
 
-# Configure page
+# Configure page FIRST
 st.set_page_config(
     page_title="GCash Cash-In",
     page_icon="💳",
     layout="centered",
     initial_sidebar_state="collapsed"
 )
+
+def initialize_session_state():
+    """Initialize session state variables with safe defaults"""
+    if 'step' not in st.session_state:
+        st.session_state.step = 'input'
+    if 'barcode_data' not in st.session_state:
+        st.session_state.barcode_data = None
+    if 'amount' not in st.session_state:
+        st.session_state.amount = ""
+
+# Initialize session state
+initialize_session_state()
 
 # Custom CSS for mobile-like interface
 st.markdown("""
@@ -224,7 +236,7 @@ st.markdown("""
     
     .barcode-number { 
         font-family: monospace;
-        font-size: 20px; 
+        font-size: 25px; 
         font-weight: 600; 
         margin-top: 10px; 
         word-break: break-all;
@@ -396,9 +408,9 @@ def create_barcode_image(code):
         # Create barcode
         barcode = Code128(code, writer=ImageWriter())
         
-        # Generate barcode image
+        # Generate barcode image without text
         buffer = BytesIO()
-        barcode.write(buffer)
+        barcode.write(buffer, options={'write_text': False})
         buffer.seek(0)
         
         # Convert to base64 for display
@@ -429,14 +441,9 @@ def validate_amount(amount_str):
         return False, "Please enter a valid amount between ₱1 and ₱50,000"
 
 def main():
-    # Initialize session state
-    if 'step' not in st.session_state:
-        st.session_state.step = 'input'
-    if 'barcode_data' not in st.session_state:
-        st.session_state.barcode_data = None
-    if 'amount' not in st.session_state:
-        st.session_state.amount = ""
-
+    # Ensure session state is initialized
+    initialize_session_state()
+    
     # Header
     st.markdown("""
     <div class="gcash-header">
@@ -549,10 +556,9 @@ def main():
             barcode_img = create_barcode_image(st.session_state.barcode_data['code'])
             if barcode_img:
                 st.markdown("""
-                <div class="barcode-container">
                 """, unsafe_allow_html=True)
                 
-                # Display barcode image
+                # Display barcode image and the number below it
                 st.markdown(f"""
                 <img src="data:image/png;base64,{barcode_img}" style="max-width: 100%; height: auto;">
                 <div class="barcode-number">
@@ -585,13 +591,6 @@ def main():
             <div class="validity-info">
                 <div class="validity-label">valid until</div>
                 <div class="validity-date">{st.session_state.barcode_data['expiry_date']}</div>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            # GCash branding
-            st.markdown("""
-            <div class="gcash-branding">
-                <div class="gcash-logo">Cash In</div>
             </div>
             """, unsafe_allow_html=True)
             
