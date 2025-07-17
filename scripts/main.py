@@ -236,7 +236,7 @@ st.markdown("""
     
     .barcode-number { 
         font-family: monospace;
-        font-size: 25px; 
+        font-size: 20px; 
         font-weight: 600; 
         margin-top: 10px; 
         word-break: break-all;
